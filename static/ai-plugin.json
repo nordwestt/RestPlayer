@@ -1,0 +1,17 @@
+{
+    "schema_version": "v1",
+    "name_for_human": "Yewtube Player",
+    "name_for_model": "song_player_API",
+    "description_for_human": "A simple API to queue and play songs using yt-dlp and mpv.",
+    "description_for_model": "Play music for the user. You can add songs to the queue, play them immediately and clear the queue.",
+    "auth": {
+        "type": "none"
+    },
+    "api": {
+        "type": "openapi",
+        "url": "http://localhost:5000/static/openapi.yaml"
+    },
+    "logo_url": "http://localhost:5000/static/logo.png",
+    "contact_email": "support@example.com",
+    "legal_info_url": "http://www.example.com/legal"
+}

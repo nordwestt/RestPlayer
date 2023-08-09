@@ -1,0 +1,112 @@
+openapi: 3.0.0
+info:
+  title: ChatGPT Song Player API
+  version: 1.0.0
+  description: A simple API to queue and play songs using yt-dlp and mpv.
+
+servers:
+  - url: http://localhost:5000
+
+paths:
+  /add_song:
+    post:
+      operationId: addSong
+      summary: Add a song to the queue.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - song_name
+              properties:
+                song_name:
+                  type: string
+                  description: Name of the song to be added to the queue.
+      responses:
+        '200':
+          description: Song added to queue successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: Song name not provided.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  /play_now:
+    post:
+      operationId: playSong
+      summary: Clear the queue and play the provided song immediately.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - song_name
+              properties:
+                song_name:
+                  type: string
+                  description: Name of the song to be played immediately.
+      responses:
+        '200':
+          description: Song will play now.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: Song name not provided.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  /stop_song:
+    post:
+      operationId: stopPlayback
+      summary: Stop playback
+      responses:
+        '200':
+          description: Playback stopped successfully
+          content: 
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  /clear_queue:
+    post:
+      operationId: clearQueue
+      summary: Clear the song queue.
+      responses:
+        '200':
+          description: Queue cleared successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
