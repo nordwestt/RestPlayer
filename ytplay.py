@@ -22,7 +22,6 @@ current_process = None
 @app.route('/.well-known/ai-plugin.json', methods=['GET'])
 @cross_origin()
 def aiPlugin():
-    print("returning!")
     return send_file("static/ai-plugin.json")
 
 def play_song():
@@ -35,57 +34,50 @@ def play_song():
         song = song_queue.get(block=True)
         current_process = subprocess.Popen(f'yt-dlp -f bestaudio ytsearch:"{song}" -o - | mpv -', shell=True, stdout=subprocess.PIPE, preexec_fn=os.setsid)
         
-        # if song and current_process == None:
-        #     print(f"Playing song {song}")
-        #     # Download and play the song using yt-dlp and a media player (e.g., mpv)
-        #     current_process = subprocess.Popen(f'yt-dlp -f bestaudio ytsearch:"{song}" -o - | mpv -', shell=True, stdout=subprocess.PIPE, preexec_fn=os.setsid)
-            
-        #     #return_code = subprocess.call(["yt-dlp", "-f", "bestaudio", f'ytsearch:{song}', "-o", "-", "|", "mpv", "-"], shell=True)
-        #     # Instead of waiting indefinitely, periodically check if the process is still running
-        #     #while current_process != None:  # While the process is still running
-        #     #    if not song_queue.empty():  # If there's a new song in the queue
-        #     #        current_process.terminate()  # Terminate the current song
-        #     #        break  # Break out of the loop to start the next song
-        #     #    time.sleep(1)  # Sleep for a short duration before checking again
-        #     #print("exited process!!")
-        #     #current_process.wait()
-        # time.sleep(0.1)
-
-@app.route('/stop_song', methods=['POST'])
+       
+@app.route('/stop_playback', methods=['POST'])
 @cross_origin()
-def stop_song():
+def stop_playback():
     global current_process
     if current_process != None:
         os.killpg(os.getpgid(current_process.pid), signal.SIGTERM)
-        #current_process.terminate()
         current_process = None
-        print("stopped process")
+        print("Stopped playback")
     return jsonify({"message": "Song stopped!"}), 200
 
-@app.route('/add_song', methods=['POST'])
+@app.route('/queue_songs', methods=['POST'])
 @cross_origin()
-def add_song():
-    song_name = request.json.get('song_name')
-    if song_name:
-        song_queue.put(song_name)
-        print("added song")
-        return jsonify({"message": "Song added to queue!"}), 200
-    return jsonify({"message": "Song name not provided!"}), 400
+def queue_songs():
+    song_names = request.json.get('song_names')
+    if song_names:
+        for song_name in song_names:
+            song_queue.put(song_name)
 
-@app.route('/play_now', methods=['POST'])
+        print("\Queued songs\n")
+        return jsonify({"message": "Song added to queue!"}), 200
+    return jsonify({"message": "Song names not provided!"}), 400
+
+@app.route('/play_songs', methods=['POST'])
 @cross_origin()
-def play_now():
+def play_songs():
     global current_process
-    song_name = request.json.get('song_name')
-    if song_name:
+    song_names = request.json.get('song_names')
+    if song_names:
         if current_process != None:
-            os.killpg(os.getpgid(current_process.pid), signal.SIGTERM)
-            #current_process.terminate()
+            try:
+                os.killpg(os.getpgid(current_process.pid), signal.SIGTERM)
+            except:
+                pass
             current_process = None
-        # Clear the queue and play the song immediately
+
+        # Clear the queue
         while not song_queue.empty():
             song_queue.get()
-        song_queue.put(song_name)
+
+        for song_name in song_names:
+            song_queue.put(song_name)
+        
+        print("Playing songs")
         return jsonify({"message": "Song will play now!"}), 200
     return jsonify({"message": "Song name not provided!"}), 400
 
@@ -94,11 +86,13 @@ def play_now():
 def clear_queue():
     while not song_queue.empty():
         song_queue.get()
+    print("Queue cleared")
     return jsonify({"message": "Queue cleared!"}), 200
 
-threading.Thread(target=play_song, daemon=True).start()
 
 if __name__ == '__main__':
     # Start the song playing thread
     threading.Thread(target=play_song).start()
     app.run(port=5000)
+else:
+    threading.Thread(target=play_song, daemon=True).start()

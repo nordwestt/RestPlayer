@@ -8,10 +8,10 @@ servers:
   - url: http://localhost:5000
 
 paths:
-  /add_song:
+  /queue_songs:
     post:
-      operationId: addSong
-      summary: Add a song to the queue.
+      operationId: queueSongs
+      summary: Add a list of songs to the playback queue
       requestBody:
         required: true
         content:
@@ -19,14 +19,16 @@ paths:
             schema:
               type: object
               required:
-                - song_name
+                - song_names
               properties:
-                song_name:
-                  type: string
-                  description: Name of the song to be added to the queue.
+                song_names:
+                  type: array
+                  items:
+                    type: string
+                  description: List of the songs to be queued
       responses:
         '200':
-          description: Song added to queue successfully.
+          description: Songs added to queue successfully.
           content:
             application/json:
               schema:
@@ -35,7 +37,7 @@ paths:
                   message:
                     type: string
         '400':
-          description: Song name not provided.
+          description: Song names not provided.
           content:
             application/json:
               schema:
@@ -44,10 +46,10 @@ paths:
                   message:
                     type: string
 
-  /play_now:
+  /play_songs:
     post:
-      operationId: playSong
-      summary: Clear the queue and play the provided song immediately.
+      operationId: playSongs
+      summary: Clear the queue and play the provided songs in order
       requestBody:
         required: true
         content:
@@ -55,14 +57,16 @@ paths:
             schema:
               type: object
               required:
-                - song_name
+                - song_names
               properties:
-                song_name:
-                  type: string
-                  description: Name of the song to be played immediately.
+                song_names:
+                  type: array
+                  items:
+                    type: string
+                  description: List of the songs to be played immediately.
       responses:
         '200':
-          description: Song will play now.
+          description: Songs will play now.
           content:
             application/json:
               schema:
@@ -71,7 +75,7 @@ paths:
                   message:
                     type: string
         '400':
-          description: Song name not provided.
+          description: Song names not provided.
           content:
             application/json:
               schema:
@@ -80,7 +84,7 @@ paths:
                   message:
                     type: string
 
-  /stop_song:
+  /stop_playback:
     post:
       operationId: stopPlayback
       summary: Stop playback
