@@ -84,6 +84,42 @@ paths:
                   message:
                     type: string
 
+  /skip_songs:
+    post:
+      operationId: skipSongs
+      summary: Skips a number of songs, given by the request body
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - number
+              properties:
+                number:
+                  type: integer
+                  description: Number of songs to skip
+      responses:
+        '200':
+          description: Songs have been skipped.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: Invalid number given
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
   /stop_playback:
     post:
       operationId: stopPlayback
@@ -91,6 +127,21 @@ paths:
       responses:
         '200':
           description: Playback stopped successfully
+          content: 
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  /start_playback:
+    post:
+      operationId: startPlayback
+      summary: Start playback
+      responses:
+        '200':
+          description: Playback started successfully
           content: 
             application/json:
               schema:
