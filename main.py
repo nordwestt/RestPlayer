@@ -28,8 +28,6 @@ def endCurrentSong():
 
 
 
-
-
 @app.route('/.well-known/ai-plugin.json', methods=['GET'])
 @cross_origin()
 def aiPlugin():
@@ -130,7 +128,9 @@ def clear_queue():
 
 if __name__ == '__main__':
     # Start the song playing thread
-    threading.Thread(target=play_song).start()
+    
     app.run(port=5000)
 else:
     threading.Thread(target=play_song, daemon=True).start()
+
+threading.Thread(target=play_song, daemon=True).start()
